@@ -1,0 +1,562 @@
+<!doctype html>
+<html lang="ko">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width,initial-scale=1">
+<title>금속의 반응성 실험실</title>
+<link href="https://fonts.googleapis.com/css2?family=Nanum+Gothic:wght@400;700;800&family=STIX+Two+Text:wght@400;600&display=swap" rel="stylesheet">
+<style>
+:root{--bg:#f4f7fb;--card:#fff;--ink:#1e293b;--muted:#64748b;--line:#e2e8f0;--blue:#2563eb;--blue-soft:#eff6ff;--orange:#f97316;--orange-soft:#fff7ed;--green:#16a34a;--red:#dc2626}
+*{box-sizing:border-box}
+body{margin:0;background:var(--bg);color:var(--ink);font-family:'Nanum Gothic',sans-serif}
+.wrap{max-width:1240px;margin:0 auto;padding:20px 16px 40px}
+header h1{margin:0;font-size:24px;font-weight:800}
+header p{margin:4px 0 0;color:var(--muted);font-size:14px}
+.card{background:var(--card);border:1px solid var(--line);border-radius:16px;padding:16px;box-shadow:0 1px 3px rgba(15,23,42,.05)}
+.card h2{margin:0 0 10px;font-size:15px;font-weight:800;color:var(--blue)}
+.f{font-family:'STIX Two Text',Georgia,serif}
+/* series */
+.series-card{margin-top:14px}
+.series{display:flex;justify-content:space-between;gap:2px;overflow-x:auto;padding:6px 2px}
+.el{display:flex;flex-direction:column;align-items:center;min-width:44px;opacity:.4;transition:.2s}
+.el.usable,.el.h{opacity:1}
+.kn{font-size:10.5px;color:var(--muted);height:15px;white-space:nowrap}
+.ball{width:38px;height:38px;border-radius:50%;display:grid;place-items:center;font-family:'STIX Two Text',Georgia,serif;font-weight:600;font-size:16px;background:radial-gradient(circle at 35% 30%,#fff,#cbd5e1);border:2.5px solid transparent;transition:.2s}
+.el.h .ball{background:radial-gradient(circle at 35% 30%,#fff,#bfdbfe);color:#1d4ed8}
+.el.selM .ball{border-color:var(--blue);box-shadow:0 0 0 4px rgba(37,99,235,.22)}
+.el.selI .ball{border-color:var(--orange);box-shadow:0 0 0 4px rgba(249,115,22,.25)}
+.trend{position:relative;height:22px;margin:6px 4px 0;background:linear-gradient(90deg,#3b82f6,#dbeafe);clip-path:polygon(0 50%,14px 0,100% 0,100% 100%,14px 100%);display:flex;justify-content:space-between;align-items:center;padding:0 12px 0 22px;font-size:12px;font-weight:700;color:#fff}
+.trend span:last-child{color:#1e40af}
+.legend{display:flex;flex-wrap:wrap;gap:14px;margin-top:10px;font-size:12px;color:var(--muted)}
+.dot{display:inline-block;width:12px;height:12px;border-radius:50%;vertical-align:-2px;margin-right:4px;border:2.5px solid}
+/* grid */
+.grid{display:grid;grid-template-columns:270px 1fr 1.3fr;gap:14px;margin-top:14px}
+.grid2{display:grid;grid-template-columns:1.25fr 1fr;gap:14px;margin-top:14px}
+@media(max-width:1060px){.grid{grid-template-columns:1fr 1fr}.controls{grid-column:1/-1}}
+@media(max-width:760px){.grid,.grid2{grid-template-columns:1fr}}
+.label{font-size:13px;font-weight:800;margin:4px 0 6px}
+.chips{display:grid;grid-template-columns:1fr 1fr;gap:6px;margin-bottom:12px}
+.controls .chips{grid-template-columns:repeat(2,1fr)}
+@media(max-width:1060px){.controls .chips{grid-template-columns:repeat(6,1fr)}}
+@media(max-width:760px){.controls .chips{grid-template-columns:repeat(3,1fr)}}
+.chip{border:1.5px solid var(--line);background:#f8fafc;border-radius:10px;padding:6px 8px;font:inherit;font-size:11.5px;color:var(--muted);cursor:pointer;text-align:left;transition:.15s}
+.chip b{display:block;font-family:'STIX Two Text',Georgia,serif;font-size:15px;color:var(--ink);font-weight:600}
+.chip:hover{border-color:#93c5fd}
+.chip.on{border-color:var(--blue);background:var(--blue-soft)}
+.chip.sol.on{border-color:var(--orange);background:var(--orange-soft)}
+.pred{display:flex;gap:6px;margin-bottom:12px}
+.pred label{flex:1;text-align:center;border:1.5px solid var(--line);border-radius:10px;padding:7px 4px;font-size:12.5px;cursor:pointer;background:#f8fafc}
+.pred input{display:none}
+.pred input:checked+span{color:var(--blue);font-weight:800}
+.pred label:has(input:checked){border-color:var(--blue);background:var(--blue-soft)}
+.btns{display:flex;gap:8px}
+.btn{flex:1;border:none;border-radius:10px;padding:10px;font:inherit;font-weight:800;font-size:14px;cursor:pointer}
+.btn.primary{background:var(--blue);color:#fff}
+.btn.primary:hover{background:#1d4ed8}
+.btn.ghost{background:#e2e8f0;color:var(--ink)}
+.speed{display:flex;align-items:center;gap:8px;margin-top:10px;font-size:12px;color:var(--muted)}
+.speed select{flex:1;font:inherit;padding:4px;border-radius:8px;border:1px solid var(--line)}
+canvas{display:block;width:100%;height:auto;border-radius:12px}
+.cap{font-size:12px;color:var(--muted);margin-top:8px;line-height:1.5}
+.stats{display:flex;gap:8px;margin-top:8px}
+.stat{flex:1;background:#f1f5f9;border-radius:10px;padding:6px 10px;font-size:11.5px;color:var(--muted)}
+.stat b{display:block;font-size:18px;color:var(--blue)}
+.plegend{display:flex;flex-wrap:wrap;gap:10px;font-size:11.5px;color:var(--muted);margin-top:8px}
+.pl{display:inline-flex;align-items:center;gap:4px}
+.pl i{width:12px;height:12px;border-radius:50%;display:inline-block}
+.status{font-size:12.5px;font-weight:700;color:var(--blue);min-height:18px;margin-top:6px}
+/* result */
+#result .empty{color:var(--muted);font-size:14px;line-height:1.7}
+.badge{display:inline-block;padding:5px 12px;border-radius:999px;font-weight:800;font-size:14px}
+.badge.yes{background:#dcfce7;color:#15803d}
+.badge.no{background:#f1f5f9;color:#475569}
+.check{display:inline-block;margin-left:8px;font-size:13px;font-weight:700}
+.res p{font-size:14px;line-height:1.75;margin:10px 0}
+.res .k{font-weight:800;color:var(--blue)}
+.eq{font-family:'STIX Two Text',Georgia,serif;font-size:19px;background:#f8fafc;border:1px solid var(--line);border-radius:10px;padding:9px 12px;margin:6px 0;overflow-x:auto;white-space:nowrap}
+.half{display:grid;grid-template-columns:auto 1fr;gap:4px 10px;align-items:center;font-size:13px;margin-top:6px}
+.half .tag{font-weight:800;font-size:12px;padding:2px 8px;border-radius:6px}
+.tag.ox{background:#fee2e2;color:#b91c1c}.tag.rd{background:#dbeafe;color:#1d4ed8}
+.half .eq{font-size:16px;margin:0}
+/* table */
+table.rec{width:100%;border-collapse:separate;border-spacing:4px;table-layout:fixed}
+table.rec th{font-size:12px;font-weight:700;color:var(--muted)}
+table.rec th.f{font-size:14px;color:var(--ink)}
+table.rec td{background:#f8fafc;border-radius:8px;height:36px;text-align:center;font-size:18px;font-weight:800;cursor:pointer;transition:.15s}
+table.rec td:hover{background:#e0ecff}
+td.o{color:var(--green);background:#f0fdf4!important}
+td.x{color:var(--red);background:#fef2f2!important}
+td.s{color:#94a3b8}
+td.ans{opacity:.45}
+td.cur{outline:2.5px solid var(--blue)}
+.tbtns{display:flex;gap:8px;margin-top:10px}
+.tbtns .btn{font-size:12.5px;padding:8px}
+.note{font-size:11.5px;color:var(--muted);margin-top:8px;line-height:1.6}
+
+/* steps */
+.step{display:none}.step.on{display:block}
+.stepper{display:flex;align-items:center;gap:10px;margin-top:14px}
+.st{display:flex;align-items:center;gap:8px;font-size:14px;font-weight:800;color:#94a3b8}
+.st span{width:28px;height:28px;border-radius:50%;display:grid;place-items:center;background:#e2e8f0;color:#64748b;font-size:14px}
+.st.on{color:var(--blue)}.st.on span{background:var(--blue);color:#fff}
+.st.done span{background:#bfdbfe;color:var(--blue)}
+.stepper .bar{flex:0 0 60px;height:3px;border-radius:2px;background:#e2e8f0}
+.controls{margin-top:14px}
+.controls .chips{grid-template-columns:repeat(6,1fr)!important}
+@media(max-width:760px){.controls .chips{grid-template-columns:repeat(3,1fr)!important}}
+.setsum{font-size:15px;margin:2px 0 10px;padding:10px 14px;background:#f8fafc;border:1px solid var(--line);border-radius:12px}
+.setsum b{color:var(--blue)}.setsum .o{color:var(--orange);font-weight:800}
+.btn.next{width:100%;padding:13px;font-size:16px}
+.btn:disabled{background:#cbd5e1;cursor:not-allowed}
+.toolbar{margin-top:14px;display:flex;flex-wrap:wrap;align-items:center;justify-content:space-between;gap:10px}
+.toolbar .setsum{margin:0;flex:1;min-width:260px}
+.tools{display:flex;flex-wrap:wrap;gap:8px;align-items:center}
+.btn.sm{flex:none;padding:8px 14px;font-size:13px}
+.tools .speed{margin:0}
+.grid{grid-template-columns:1fr 1.3fr!important}
+@media(max-width:760px){.grid{grid-template-columns:1fr!important}}
+table.rec th.f{font-size:12.5px!important}
+</style>
+</head>
+<body>
+<div class="wrap">
+  <header>
+    <h1>금속의 반응성 실험실</h1>
+    <p>이온화 경향을 비교하여 금속과 금속 이온(또는 산)의 반응 여부를 예상하고 확인해 보자.</p>
+    <div class="stepper">
+      <div class="st" id="st1"><span>1</span>실험 설정 · 예상하기</div>
+      <div class="bar"></div>
+      <div class="st" id="st2"><span>2</span>실험 결과 확인하기</div>
+    </div>
+  </header>
+
+  <!-- ========== 1단계 ========== -->
+  <div class="step" id="step1">
+    <section class="card series-card">
+      <h2>여러 가지 금속의 이온화 경향</h2>
+      <div class="series" id="series"></div>
+      <div class="trend"><span>← 이온화 경향 크다 (전자를 잃기 쉽다)</span><span>작다</span></div>
+      <div class="legend">
+        <span><span class="dot" style="border-color:var(--blue)"></span>금속판</span>
+        <span><span class="dot" style="border-color:var(--orange)"></span>수용액 속 양이온</span>
+        <span>· 진하게 표시된 금속만 실험에 사용 (K, Ca, Na는 물과 직접 반응하므로 제외)</span>
+      </div>
+    </section>
+
+    <section class="card controls">
+      <h2>실험 설정</h2>
+      <div class="label">① 금속판을 고르세요</div>
+      <div class="chips" id="metalChips"></div>
+      <div class="label">② 수용액을 고르세요</div>
+      <div class="chips" id="solChips"></div>
+      <div class="label">③ 결과를 예상하세요</div>
+      <div class="setsum" id="setsum1"></div>
+      <div class="pred">
+        <label><input type="radio" name="pred" value="yes"><span>반응한다</span></label>
+        <label><input type="radio" name="pred" value="no"><span>반응하지 않는다</span></label>
+      </div>
+      <button class="btn primary next" id="nextBtn" disabled>예상을 선택하세요</button>
+    </section>
+  </div>
+
+  <!-- ========== 2단계 ========== -->
+  <div class="step" id="step2">
+    <section class="card toolbar">
+      <div class="setsum" id="setsum2"></div>
+      <div class="tools">
+        <button class="btn ghost sm" id="backBtn">← 다른 조합 고르기</button>
+        <button class="btn ghost sm" id="replayBtn">다시 보기</button>
+        <button class="btn primary sm" id="pauseBtn">일시정지</button>
+        <label class="speed">속도
+          <select id="speed"><option value="0.5">느리게</option><option value="1" selected>보통</option><option value="2">빠르게</option></select>
+        </label>
+      </div>
+    </section>
+
+    <div class="grid">
+      <section class="card">
+        <h2>거시적 관찰</h2>
+        <canvas id="macro"></canvas>
+        <div class="cap" id="macroCap"></div>
+      </section>
+      <section class="card">
+        <h2>입자 모형 (금속판 표면 확대)</h2>
+        <canvas id="micro"></canvas>
+        <div class="stats">
+          <div class="stat">산화된 금속 원자<b id="sOx">0</b></div>
+          <div class="stat">이동한 전자<b id="sE">0</b></div>
+          <div class="stat">환원된 양이온<b id="sRd">0</b></div>
+        </div>
+        <div class="plegend" id="plegend"></div>
+        <div class="status" id="pstatus"></div>
+      </section>
+    </div>
+
+    <div class="grid2">
+      <section class="card" id="result"></section>
+      <section class="card">
+        <h2>실험 기록표</h2>
+        <table class="rec" id="rec"></table>
+        <div class="note">○ 반응이 일어남 &nbsp; × 반응이 일어나지 않음 &nbsp; — 같은 금속<br>빈칸을 누르면 그 조합을 고른 채로 1단계로 돌아갑니다.</div>
+        <div class="tbtns">
+          <button class="btn ghost" id="showAll">정답 모두 보기</button>
+          <button class="btn ghost" id="clearRec">기록 지우기</button>
+        </div>
+      </section>
+    </div>
+  </div>
+</div>
+
+<script>
+/* ---------------- 데이터 ---------------- */
+const SERIES=[['K','칼륨'],['Ca','칼슘'],['Na','나트륨'],['Mg','마그네슘'],['Al','알루미늄'],['Zn','아연'],['Fe','철'],['Ni','니켈'],['Sn','주석'],['Pb','납'],['H','(수소)'],['Cu','구리'],['Hg','수은'],['Ag','은'],['Pt','백금'],['Au','금']];
+const rankOf=s=>SERIES.findIndex(e=>e[0]===s);
+const EL={
+  Mg:{name:'마그네슘',q:2,col:'#cfd4da'},
+  Zn:{name:'아연',q:2,col:'#9aa7b3'},
+  Fe:{name:'철',q:2,col:'#7b736d'},
+  Ni:{name:'니켈',q:2,col:'#b3ad95'},
+  Cu:{name:'구리',q:2,col:'#c8693a'},
+  Ag:{name:'은',q:1,col:'#d9dee5'},
+  H:{name:'수소',q:1,col:'#fbcfe8'}
+};
+const METALS=['Mg','Zn','Fe','Ni','Cu','Ag'];
+const SOLS=[
+  {id:'H2SO4',name:'묽은 황산',f:'H<sub>2</sub>SO<sub>4</sub>',fp:'H₂SO₄',ion:'H',an:'SO₄²⁻'},
+  {id:'MgSO4',name:'황산 마그네슘',f:'MgSO<sub>4</sub>',fp:'MgSO₄',ion:'Mg',an:'SO₄²⁻'},
+  {id:'ZnSO4',name:'황산 아연',f:'ZnSO<sub>4</sub>',fp:'ZnSO₄',ion:'Zn',an:'SO₄²⁻'},
+  {id:'FeSO4',name:'황산 철(Ⅱ)',f:'FeSO<sub>4</sub>',fp:'FeSO₄',ion:'Fe',an:'SO₄²⁻'},
+  {id:'CuSO4',name:'황산 구리(Ⅱ)',f:'CuSO<sub>4</sub>',fp:'CuSO₄',ion:'Cu',an:'SO₄²⁻'},
+  {id:'AgNO3',name:'질산 은',f:'AgNO<sub>3</sub>',fp:'AgNO₃',ion:'Ag',an:'NO₃⁻'}
+];
+const TINT={Cu:[56,128,222],Fe:[150,200,140],Ni:[100,180,110]};
+const COLNAME=s=>s==='Cu'?'푸른색':s==='Fe'?'연한 녹색':s==='Ni'?'녹색':'무색';
+const BASE=[226,238,250];
+const DEP={Cu:'#9c4a22',Ag:'#cfd5dc',Fe:'#2f2a27',Zn:'#5f6a75',Ni:'#6f6b5c',Mg:'#9aa0a6'};
+const DEPDESC={Cu:'붉은색의 구리',Ag:'은백색(회색)의 은',Fe:'검은색의 철',Zn:'회색의 아연',Ni:'회색의 니켈',Mg:'회색의 마그네슘'};
+
+/* ---------------- 유틸 ---------------- */
+const $=s=>document.querySelector(s);
+const hasJong=w=>{const c=w.charCodeAt(w.length-1);return c>=0xAC00&&c<=0xD7A3&&(c-0xAC00)%28!==0};
+const NJ=(s,a,b)=>EL[s].name+'('+s+')'+(hasJong(EL[s].name)?a:b);
+const ionH=(s,q)=>s+(q===1?'<sup>+</sup>':`<sup>${q}+</sup>`);
+const ionT=(s,q)=>s+(q===0?'':q===1?'⁺':'²⁺');
+const gcd=(a,b)=>b?gcd(b,a%b):a;
+function hex2rgb(h){const n=parseInt(h.slice(1),16);return[(n>>16)&255,(n>>8)&255,n&255]}
+function shade(h,a){return'rgb('+hex2rgb(h).map(v=>Math.max(0,Math.min(255,v+a))).join(',')+')'}
+const rgba=(c,a)=>`rgba(${c[0]|0},${c[1]|0},${c[2]|0},${a})`;
+const mix=(a,b,t)=>a.map((v,i)=>v+(b[i]-v)*t);
+function setup(c,w,h){const d=window.devicePixelRatio||1;c.width=w*d;c.height=h*d;const g=c.getContext('2d');g.setTransform(d,0,0,d,0,0);return g}
+
+/* ---------------- 상태 ---------------- */
+const S={metal:'Zn',sol:'CuSO4',started:false,running:false,t:0,revealed:false,pm:0,done:false};
+const sol=()=>SOLS.find(s=>s.id===S.sol);
+const ionOf=()=>sol().ion;
+const reacts=(m=S.metal,n=ionOf())=>m!==n&&rankOf(m)<rankOf(n);
+
+/* ---------------- UI 구성 ---------------- */
+const ser=$('#series');
+SERIES.forEach(([s,n])=>{const d=document.createElement('div');d.className='el'+(s==='H'?' h':'')+(METALS.includes(s)?' usable':'');d.dataset.s=s;d.innerHTML=`<span class="kn">${n}</span><span class="ball">${s}</span>`;ser.appendChild(d)});
+$('#metalChips').innerHTML=METALS.map(m=>`<button class="chip" data-m="${m}"><b>${m}</b>${EL[m].name}</button>`).join('');
+$('#solChips').innerHTML=SOLS.map(s=>`<button class="chip sol" data-s="${s.id}"><b>${s.f}</b>${s.name}</button>`).join('');
+document.querySelectorAll('[data-m]').forEach(b=>{if(b.tagName==='BUTTON')b.onclick=()=>{S.metal=b.dataset.m;resetAll(true)}});
+document.querySelectorAll('[data-s]').forEach(b=>{if(b.tagName==='BUTTON')b.onclick=()=>{S.sol=b.dataset.s;resetAll(true)}});
+
+function updUI(){
+  document.querySelectorAll('.chip[data-m]').forEach(b=>b.classList.toggle('on',b.dataset.m===S.metal));
+  document.querySelectorAll('.chip[data-s]').forEach(b=>b.classList.toggle('on',b.dataset.s===S.sol));
+  document.querySelectorAll('.el').forEach(e=>{e.classList.toggle('selM',e.dataset.s===S.metal);e.classList.toggle('selI',e.dataset.s===ionOf())});
+  document.querySelectorAll('#rec td').forEach(td=>td.classList.toggle('cur',td.dataset.m===S.metal&&td.dataset.s===S.sol));
+  const s=sol();
+  const pv=document.querySelector('input[name=pred]:checked');
+  const combo=`<b>${EL[S.metal].name}(${S.metal})판</b> + <span class="o f">${s.f}</span>(<i>aq</i>, ${s.name})`;
+  $('#setsum1').innerHTML='선택한 조합: '+combo;
+  $('#setsum2').innerHTML=combo+' &nbsp;·&nbsp; 나의 예상: <b>'+(pv?(pv.value==='yes'?'반응한다':'반응하지 않는다'):'-')+'</b>';
+  const nb=$('#nextBtn');nb.disabled=!pv;nb.textContent=pv?'실험하러 가기 →':'예상을 선택하세요';
+  $('#macroCap').innerHTML=`<b>${EL[S.metal].name}판</b>을 <b class="f">${s.f}</b>(<i>aq</i>)에 넣은 모습`;
+  const N=s.ion;
+  $('#plegend').innerHTML=
+    `<span class="pl"><i style="background:${EL[S.metal].col};border:1.5px solid ${shade(EL[S.metal].col,-50)}"></i>${S.metal} 원자</span>`+
+    `<span class="pl"><i style="background:${EL[N].col}99;border:1.5px dashed ${shade(EL[N].col,-40)}"></i>${ionT(N,EL[N].q)}</span>`+
+    `<span class="pl"><i style="background:#c4b5fd"></i>${s.an} (구경꾼 이온)</span>`+
+    `<span class="pl"><i style="background:#facc15;width:9px;height:9px"></i>전자(e⁻)</span>`;
+}
+
+/* 기록표 */
+(function(){
+  let h='<tr><th>금속판＼수용액</th>'+SOLS.map(s=>`<th class="f">${s.f}</th>`).join('')+'</tr>';
+  METALS.forEach(m=>{h+=`<tr><th class="f">${m}</th>`+SOLS.map(s=>`<td id="c-${m}-${s.id}" data-m="${m}" data-s="${s.id}"></td>`).join('')+'</tr>'});
+  $('#rec').innerHTML=h;
+  document.querySelectorAll('#rec td').forEach(td=>td.onclick=()=>{S.metal=td.dataset.m;S.sol=td.dataset.s;goStep(1)});
+})();
+function ansOf(m,sid){const N=SOLS.find(s=>s.id===sid).ion;return m===N?'s':reacts(m,N)?'o':'x'}
+function fillCell(m,sid,ghost){const td=$(`#c-${m}-${sid}`);if(!ghost)td.classList.remove('ans');else if(td.textContent)return;const a=ansOf(m,sid);td.classList.remove('o','x','s');td.classList.add(a);if(ghost)td.classList.add('ans');td.textContent=a==='o'?'○':a==='x'?'×':'—'}
+$('#showAll').onclick=()=>METALS.forEach(m=>SOLS.forEach(s=>fillCell(m,s.id,true)));
+$('#clearRec').onclick=()=>document.querySelectorAll('#rec td').forEach(td=>{td.textContent='';td.className=''});
+
+/* ---------------- 거시 캔버스 ---------------- */
+const MW=360,MH=380,mc=$('#macro'),mx=setup(mc,MW,MH);
+const B={x0:50,x1:310,y0:70,y1:352,ly:140};
+const P={x0:158,x1:202,y0:28,y1:322};
+let deposits=[],bubbles=[];
+function genDeposits(){
+  deposits=[];
+  for(let i=0;i<90;i++){
+    const side=Math.random();let x;
+    if(side<.3)x=P.x0+(Math.random()-.5)*4;else if(side<.6)x=P.x1+(Math.random()-.5)*4;else x=P.x0+3+Math.random()*(P.x1-P.x0-6);
+    const y=P.y1-Math.pow(Math.random(),1.3)*(P.y1-B.ly-8);
+    deposits.push({x,y,s:1.6+Math.random()*3.2,a:Math.random()*6.28});
+  }
+  deposits.sort(()=>Math.random()-.5);
+}
+function beakerPath(g){
+  g.beginPath();g.moveTo(B.x0-7,B.y0);g.lineTo(B.x0,B.y0+7);g.lineTo(B.x0,B.y1-14);
+  g.quadraticCurveTo(B.x0,B.y1,B.x0+14,B.y1);g.lineTo(B.x1-14,B.y1);g.quadraticCurveTo(B.x1,B.y1,B.x1,B.y1-14);
+  g.lineTo(B.x1,B.y0+7);g.lineTo(B.x1+7,B.y0);
+}
+function solColor(p){
+  const N=ionOf(),M=S.metal,r=reacts();let c=BASE.slice();
+  const amt=[[N,r?1-p:1]];if(r&&N!=='H')amt.push([M,p]);else if(r)amt.push([M,p]);
+  amt.forEach(([s,a])=>{if(TINT[s])c=mix(c,TINT[s],a*.72)});
+  return c;
+}
+function drawMacro(dt){
+  const g=mx,p=S.pm,r=reacts(),N=ionOf(),M=S.metal,col=solColor(p);
+  g.clearRect(0,0,MW,MH);
+  g.fillStyle='#eef2f7';g.beginPath();g.ellipse(180,358,150,10,0,0,6.28);g.fill();
+  // 용액
+  g.save();beakerPath(g);g.closePath();g.clip();
+  const lg=g.createLinearGradient(0,B.ly,0,B.y1);lg.addColorStop(0,rgba(col,.75));lg.addColorStop(1,rgba(mix(col,[120,150,190],.15),.92));
+  g.fillStyle=lg;g.fillRect(0,B.ly,MW,MH);
+  g.fillStyle=rgba(mix(col,[255,255,255],.4),.9);g.fillRect(0,B.ly,MW,3);
+  g.restore();
+  // 금속판
+  const inset=r?2.5*p:0,w=P.x1-P.x0,mcol=EL[M].col;
+  const pg=g.createLinearGradient(P.x0,0,P.x1,0);pg.addColorStop(0,shade(mcol,-30));pg.addColorStop(.35,shade(mcol,25));pg.addColorStop(.7,mcol);pg.addColorStop(1,shade(mcol,-20));
+  g.fillStyle=pg;g.fillRect(P.x0,P.y0,w,B.ly-P.y0);
+  g.fillRect(P.x0+inset,B.ly,w-2*inset,P.y1-B.ly);
+  g.strokeStyle=shade(mcol,-55);g.lineWidth=1;g.strokeRect(P.x0+.5,P.y0+.5,w-1,B.ly-P.y0);
+  g.strokeRect(P.x0+inset+.5,B.ly,w-2*inset-1,P.y1-B.ly-.5);
+  g.fillStyle=rgba(col,.28);g.fillRect(P.x0+inset,B.ly,w-2*inset,P.y1-B.ly);
+  // 석출물
+  if(r&&N!=='H'){
+    const n=Math.floor(p*deposits.length),dc=DEP[N];
+    for(let i=0;i<n;i++){const d=deposits[i];
+      if(N==='Ag'){g.strokeStyle='#8b96a3';g.lineWidth=1.1;g.beginPath();
+        for(let k=0;k<4;k++){const a=d.a+k*1.57;g.moveTo(d.x,d.y);g.lineTo(d.x+Math.cos(a)*d.s*2,d.y+Math.sin(a)*d.s*2)}g.stroke();
+        g.fillStyle=dc;g.beginPath();g.arc(d.x,d.y,d.s*.7,0,6.28);g.fill();
+      }else{g.fillStyle=dc;g.beginPath();g.ellipse(d.x,d.y,d.s,d.s*.8,d.a,0,6.28);g.fill();}
+    }
+  }
+  // 기포
+  if(r&&N==='H'&&S.running){
+    const rate=28*Math.max(.35,1-p*.6);
+    if(Math.random()<rate*dt){const e=Math.random();bubbles.push({x:e<.4?P.x0-2:e<.8?P.x1+2:P.x0+4+Math.random()*(w-8),y:B.ly+12+Math.random()*(P.y1-B.ly-12),r:1.5+Math.random()*2.5,v:35+Math.random()*30,ph:Math.random()*6})}
+  }
+  if(S.running)bubbles.forEach(b=>{b.y-=b.v*dt;b.ph+=dt*6;b.r=Math.min(b.r+dt*.8,5)});
+  bubbles=bubbles.filter(b=>b.y>B.ly+3);
+  bubbles.forEach(b=>{g.beginPath();g.arc(b.x+Math.sin(b.ph)*1.5,b.y,b.r,0,6.28);g.fillStyle='rgba(255,255,255,.55)';g.fill();g.strokeStyle='rgba(100,130,170,.6)';g.lineWidth=1;g.stroke()});
+  // 비커
+  beakerPath(g);g.strokeStyle='#94a3b8';g.lineWidth=3;g.stroke();
+  g.strokeStyle='rgba(255,255,255,.7)';g.lineWidth=4;g.beginPath();g.moveTo(B.x0+10,B.y0+30);g.lineTo(B.x0+10,B.y1-30);g.stroke();
+  g.strokeStyle='#94a3b8';g.lineWidth=1.2;
+  for(let i=0;i<5;i++){const y=B.y1-40-i*42;g.beginPath();g.moveTo(B.x1-4,y);g.lineTo(B.x1-(i%2?14:22),y);g.stroke()}
+  // 라벨
+  g.fillStyle='#1e293b';g.font='bold 14px "Nanum Gothic",sans-serif';g.textAlign='center';
+  g.fillText(EL[M].name+' ('+M+')',180,18);
+  g.font='600 16px "STIX Two Text",Georgia,serif';g.fillStyle='#334155';
+  g.fillText(sol().fp+'(aq)',255,B.y1-16);
+}
+
+/* ---------------- 입자 캔버스 ---------------- */
+const PW=480,PH=380,pc=$('#micro'),px=setup(pc,PW,PH);
+const D=22,R=11,ROWS=16,COLS=4,X0=8,Y0=(PH-ROWS*D)/2,SX=X0+COLS*D;
+const rowY=r=>Y0+r*D+R;
+let ps;
+function initParticles(){
+  const N=ionOf();
+  ps={exposed:Array(ROWS).fill(COLS-1),ions:[],pool:[],anims:[],marks:[],ox:0,e:0,red:0,total:N==='H'?14:12};
+  const place=(r)=>{for(let k=0;k<40;k++){const x=SX+34+Math.random()*(PW-SX-50),y=r+Math.random()*(PH-2*r);if(!ps.ions.some(o=>Math.hypot(o.x-x,o.y-y)<o.r+r+4))return[x,y]}return[SX+40+Math.random()*(PW-SX-60),20+Math.random()*(PH-40)]};
+  for(let i=0;i<ps.total;i++){const r=N==='H'?8:R,[x,y]=place(r);ps.ions.push({x,y,vx:(Math.random()-.5)*60,vy:(Math.random()-.5)*60,r,sym:N,q:EL[N].q,kind:'target',st:'free',pend:0})}
+  const nA=sol().an.startsWith('SO')?5:7;
+  for(let i=0;i<nA;i++){const[x,y]=place(9);ps.ions.push({x,y,vx:(Math.random()-.5)*60,vy:(Math.random()-.5)*60,r:9,kind:'anion',st:'free'})}
+  updStats();
+}
+function updStats(){$('#sOx').textContent=ps.ox;$('#sE').textContent=ps.e;$('#sRd').textContent=ps.red}
+function oxidize(y){
+  let best=-1,bd=1e9;
+  for(let r=0;r<ROWS;r++)if(ps.exposed[r]>=0){const d=Math.abs(rowY(r)-y);if(d<bd){bd=d;best=r}}
+  if(best<0)return false;
+  const c=ps.exposed[best],ax=X0+c*D+R,ay=rowY(best),M=S.metal,m=EL[M].q;
+  ps.exposed[best]--;
+  ps.ions.push({x:ax,y:ay,vx:45,vy:(Math.random()-.5)*20,r:R,sym:M,q:m,kind:'prod',st:'leave'});
+  const ex=Math.max(X0+R,ax-D);
+  for(let i=0;i<m;i++)ps.pool.push({x:ex+(Math.random()-.5)*6,y:ay+(i-(m-1)/2)*9});
+  ps.ox++;return true;
+}
+function capture(o){
+  const n=o.q;
+  while(ps.pool.length<n){if(!oxidize(o.y))break}
+  if(ps.pool.length<n)return;
+  o.st='cap';o.vx=o.vy=0;o.x=SX+o.r;o.pend=n;
+  ps.pool.sort((a,b)=>Math.hypot(a.x-o.x,a.y-o.y)-Math.hypot(b.x-o.x,b.y-o.y));
+  ps.pool.splice(0,n).forEach(e=>ps.anims.push({x0:e.x,y0:e.y,t:0,o}));
+}
+function reduce(o){
+  ps.red++;
+  if(o.sym==='H'){
+    o.kind='had';o.st='fixed';o.q=0;o.r=6;o.x=SX+6;
+    const had=ps.ions.filter(i=>i.kind==='had');
+    if(had.length>=2){const[a,b]=had;ps.ions=ps.ions.filter(i=>i!==a&&i!==b);
+      ps.ions.push({kind:'h2',st:'rise',x:SX+14,y:(a.y+b.y)/2,r:7})}
+  }else{
+    o.kind='dep';o.st='fixed';o.q=0;o.x=SX+R;
+    for(let k=0;k<6;k++){if(ps.ions.some(i=>i!==o&&i.kind==='dep'&&Math.hypot(i.x-o.x,i.y-o.y)<D*.9))o.x+=D*.85;else break}
+  }
+  if(ps.red>=ps.total){S.done=true}
+}
+function stepParticles(dt){
+  const active=S.running&&reacts();
+  ps.ions.forEach(o=>{
+    if(o.st==='free'){
+      o.vx+=(Math.random()-.5)*450*dt;o.vy+=(Math.random()-.5)*450*dt;
+      const sp=Math.hypot(o.vx,o.vy),mxs=o.kind==='anion'?70:85;if(sp>mxs){o.vx*=mxs/sp;o.vy*=mxs/sp}
+      o.x+=o.vx*dt;o.y+=o.vy*dt;
+      if(o.y<o.r){o.y=o.r;o.vy=Math.abs(o.vy)}if(o.y>PH-o.r){o.y=PH-o.r;o.vy=-Math.abs(o.vy)}
+      if(o.x>PW-o.r){o.x=PW-o.r;o.vx=-Math.abs(o.vx)}
+      if(o.x<SX+o.r){o.x=SX+o.r;o.vx=Math.abs(o.vx)+10;
+        if(o.kind==='target'){
+          if(active)capture(o);
+          else if(S.running&&ps.marks.length<6)ps.marks.push({x:SX+2,y:o.y,t:0});
+        }}
+    }else if(o.st==='leave'){o.x+=o.vx*dt;o.y+=o.vy*dt;if(o.x>=SX+o.r+3)o.st='free'}
+    else if(o.st==='rise'){o.y-=55*dt;o.x+=18*dt}
+  });
+  ps.ions=ps.ions.filter(o=>!(o.st==='rise'&&o.y<-12));
+  const dur=.55;
+  ps.anims.forEach(a=>{a.t+=dt/dur;if(a.t>=1&&!a.fin){a.fin=true;ps.e++;a.o.pend--;if(a.o.pend===0)reduce(a.o)}});
+  ps.anims=ps.anims.filter(a=>!a.fin);
+  ps.marks.forEach(m=>m.t+=dt);ps.marks=ps.marks.filter(m=>m.t<1);
+  updStats();
+}
+function drawParticles(){
+  const g=px,M=S.metal,col=solColor(S.pm);
+  g.fillStyle=rgba(mix([255,255,255],col,.4),1);g.fillRect(0,0,PW,PH);
+  g.fillStyle='#e8ecf2';g.fillRect(0,0,SX,PH);
+  // 금속 격자
+  const mc=EL[M].col;
+  for(let r=0;r<ROWS;r++)for(let c=0;c<=ps.exposed[r];c++){
+    const x=X0+c*D+R,y=rowY(r);g.beginPath();g.arc(x,y,R-.5,0,6.28);
+    const rg=g.createRadialGradient(x-3,y-3,1,x,y,R);rg.addColorStop(0,shade(mc,35));rg.addColorStop(1,mc);
+    g.fillStyle=rg;g.fill();g.strokeStyle=shade(mc,-55);g.lineWidth=1;g.stroke();
+    g.fillStyle='#1e293b';g.font='bold 9px "Nanum Gothic",sans-serif';g.textAlign='center';g.textBaseline='middle';g.fillText(M,x,y+.5);
+  }
+  g.setLineDash([4,4]);g.strokeStyle='#94a3b8';g.beginPath();g.moveTo(SX,0);g.lineTo(SX,PH);g.stroke();g.setLineDash([]);
+  // 반발 표시
+  ps.marks.forEach(m=>{g.strokeStyle=`rgba(100,116,139,${1-m.t})`;g.lineWidth=1.5;g.beginPath();g.arc(m.x+6,m.y,6+m.t*10,-1.2,1.2);g.stroke()});
+  // 입자
+  const order=['anion','prod','target','dep','had','h2'];
+  ps.ions.slice().sort((a,b)=>order.indexOf(a.kind)-order.indexOf(b.kind)).forEach(o=>{
+    g.textAlign='center';g.textBaseline='middle';
+    if(o.kind==='anion'){g.beginPath();g.arc(o.x,o.y,o.r,0,6.28);g.fillStyle='#ddd6fe';g.fill();g.strokeStyle='#8b5cf6';g.lineWidth=1;g.stroke();
+      g.fillStyle='#5b21b6';g.font='bold 7px "Nanum Gothic",sans-serif';g.fillText(sol().an,o.x,o.y+.5);return}
+    if(o.kind==='h2'){[-5,5].forEach(d=>{g.beginPath();g.arc(o.x+d,o.y,6,0,6.28);g.fillStyle='#fdf2f8';g.fill();g.strokeStyle='#db2777';g.lineWidth=1.2;g.stroke()});
+      g.fillStyle='#9d174d';g.font='bold 8px "Nanum Gothic",sans-serif';g.fillText('H₂',o.x,o.y+.5);return}
+    const el=EL[o.sym];g.beginPath();g.arc(o.x,o.y,o.r-.5,0,6.28);
+    if(o.q===0){g.fillStyle=el.col;g.fill();g.strokeStyle=shade(el.col,-55);g.lineWidth=1.2;g.stroke()}
+    else{g.fillStyle=el.col+'99';g.fill();g.setLineDash([3,2]);g.strokeStyle=shade(el.col,-50);g.lineWidth=1.8;g.stroke();g.setLineDash([])}
+    g.fillStyle='#1e293b';g.font=`bold ${o.r<9?8:9}px "Nanum Gothic",sans-serif`;g.fillText(ionT(o.sym,o.q),o.x,o.y+.5);
+  });
+  // 전자
+  const drawE=(x,y)=>{g.beginPath();g.arc(x,y,4,0,6.28);g.fillStyle='#facc15';g.fill();g.strokeStyle='#a16207';g.lineWidth=1;g.stroke()};
+  ps.pool.forEach(e=>drawE(e.x,e.y));
+  ps.anims.forEach(a=>{const t=Math.min(1,a.t),x=a.x0+(a.o.x-a.x0)*t,y=a.y0+(a.o.y-a.y0)*t;
+    g.beginPath();g.arc(x,y,8,0,6.28);g.fillStyle='rgba(250,204,21,.25)';g.fill();drawE(x,y);
+    g.fillStyle='#713f12';g.font='bold 9px "Nanum Gothic",sans-serif';g.fillText('e⁻',x,y-11)});
+  g.fillStyle='#475569';g.font='bold 11px "Nanum Gothic",sans-serif';g.textAlign='left';g.textBaseline='alphabetic';
+  g.fillText('금속판',X0+2,PH-6);g.fillText('수용액',SX+8,PH-6);
+}
+
+/* ---------------- 결과 해석 ---------------- */
+function reveal(){
+  S.revealed=true;
+  const s=sol(),N=s.ion,M=S.metal,same=M===N,r=reacts(),m=EL[M].q,n=EL[N].q;
+  const pred=document.querySelector('input[name=pred]:checked');
+  let chk='<span class="check" style="color:#64748b">(예상을 선택하지 않았어요)</span>';
+  if(pred){const ok=(pred.value==='yes')===r;chk=ok?'<span class="check" style="color:#16a34a">✔ 예상 적중!</span>':'<span class="check" style="color:#dc2626">✘ 예상과 달라요</span>'}
+  let why,obs,eqs='';
+  if(same){
+    why=`같은 금속과 그 금속의 이온 사이에서는 이온화 경향의 차이가 없으므로 반응이 일어나지 않는다.`;obs='아무 변화가 나타나지 않는다.';
+  }else if(r){
+    const L=m*n/gcd(m,n),a=L/m,b=L/n,c=k=>k===1?'':k;
+    const prodR=N==='H'?`${c(b/2)}H<sub>2</sub>(<i>g</i>)`:`${c(b)}${N}(<i>s</i>)`;
+    eqs=`<div class="eq">${c(a)}${M}(<i>s</i>) + ${c(b)}${ionH(N,n)}(<i>aq</i>) ⟶ ${c(a)}${ionH(M,m)}(<i>aq</i>) + ${prodR}</div>
+    <div class="half"><span class="tag ox">산화</span><div class="eq">${M} ⟶ ${ionH(M,m)} + ${m}e<sup>−</sup></div>
+    <span class="tag rd">환원</span><div class="eq">${N==='H'?'2H<sup>+</sup> + 2e<sup>−</sup> ⟶ H<sub>2</sub>':`${ionH(N,n)} + ${n}e<sup>−</sup> ⟶ ${N}`}</div></div>`;
+    if(N==='H'){
+      why=`<span class="k">${NJ(M,'은','는')} 수소(H)보다 이온화 경향이 크다.</span> ${NJ(M,'이','가')} 전자를 잃고 ${ionH(M,m)}으로 산화되어 녹아 들어가고, H<sup>+</sup>은 전자를 얻어 H<sub>2</sub> 기체로 환원된다.`;
+      obs='금속판 표면에서 기포(H<sub>2</sub>)가 발생하고, 금속판이 조금씩 녹는다.';
+    }else{
+      why=`<span class="k">${NJ(M,'은','는')} ${EL[N].name}(${N})보다 이온화 경향이 크다.</span> ${NJ(M,'이','가')} 전자를 잃고(산화) ${ionH(M,m)}이 되어 녹아 들어가고, ${ionH(N,n)}은 전자를 얻어(환원) ${N}으로 석출된다.`;
+      const c0=COLNAME(N),c1=COLNAME(M);
+      const ct=c0===c1?`수용액은 ${c0} 그대로이다`:`수용액의 색이 ${c0}에서 점점 ${c1}으로 변한다`;
+      obs=`금속판 표면에 ${DEPDESC[N]}${hasJong(DEPDESC[N])?'이':'가'} 석출되고, ${ct}.`;
+    }
+  }else{
+    const tgt=N==='H'?'H<sup>+</sup>':ionH(N,n);
+    why=`<span class="k">${NJ(M,'은','는')} ${N==='H'?'수소(H)':EL[N].name+'('+N+')'}보다 이온화 경향이 작다.</span> 따라서 ${tgt}에게 전자를 줄 수 없어 반응이 일어나지 않는다.`;
+    obs=N==='H'?'기포가 발생하지 않고, 아무 변화가 나타나지 않는다.':'아무 변화가 나타나지 않는다.';
+  }
+  $('#result').innerHTML=`<h2>실험 결과와 해석</h2><div class="res">
+    <span class="badge ${r?'yes':'no'}">${same?'변화 없음 (같은 금속)':r?'반응이 일어난다':'반응이 일어나지 않는다'}</span>${chk}
+    <p><b>관찰</b> · ${obs}</p><p><b>해석</b> · ${why}</p>${eqs}</div>`;
+  fillCell(M,S.sol,false);
+}
+
+/* ---------------- 제어 ---------------- */
+const pauseBtn=$('#pauseBtn');
+const EMPTY='<h2>실험 결과와 해석</h2><div class="empty">실험을 관찰하는 중입니다. 잠시 후 결과와 해석이 나타납니다.</div>';
+document.querySelectorAll('input[name=pred]').forEach(i=>i.onchange=updUI);
+function goStep(n){
+  $('#step1').classList.toggle('on',n===1);$('#step2').classList.toggle('on',n===2);
+  $('#st1').className='st '+(n===1?'on':'done');$('#st2').className='st '+(n===2?'on':'');
+  if(n===1){resetAll(true)}else{resetAll(false);startRun()}
+  window.scrollTo({top:0,behavior:'smooth'});
+}
+function startRun(){S.started=true;S.running=true;pauseBtn.textContent='일시정지'}
+$('#nextBtn').onclick=()=>{if(document.querySelector('input[name=pred]:checked'))goStep(2)};
+$('#backBtn').onclick=()=>goStep(1);
+$('#replayBtn').onclick=()=>{resetAll(false);startRun()};
+pauseBtn.onclick=()=>{S.running=!S.running;pauseBtn.textContent=S.running?'일시정지':'계속'};
+function resetAll(clearPred){
+  S.started=false;S.running=false;S.t=0;S.revealed=false;S.pm=0;S.done=false;
+  bubbles=[];genDeposits();initParticles();
+  if(clearPred)document.querySelectorAll('input[name=pred]').forEach(i=>i.checked=false);
+  $('#result').innerHTML=EMPTY;
+  $('#pstatus').textContent='';
+  updUI();
+}
+
+let last=performance.now();
+function loop(now){
+  let dt=Math.min(.05,(now-last)/1000);last=now;
+  dt*=parseFloat($('#speed').value);
+  if(!S.started||S.running)stepParticles(dt);
+  if(S.running){
+    S.t+=dt;
+    const p=ps.red/ps.total;S.pm+=(p-S.pm)*Math.min(1,dt*2.5);
+    if(!S.revealed&&S.t>3.5&&(!reacts()||ps.red>0))reveal();
+    const st=$('#pstatus');
+    if(S.done)st.textContent='반응 완료 — 모형 속 양이온이 모두 환원되었다.';
+    else if(reacts())st.textContent='금속 원자 → 전자 → 양이온으로 전자가 이동하는 중…';
+    else st.textContent='양이온이 금속판에 닿아도 전자가 이동하지 않는다.';
+  }
+  drawMacro(S.running?dt:0);
+  drawParticles();
+  requestAnimationFrame(loop);
+}
+goStep(1);
+requestAnimationFrame(loop);
+</script>
+</body>
+</html>
